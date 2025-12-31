@@ -1,38 +1,31 @@
-from flask import Flask, jsonify
-import os
 import requests
 
-app = Flask(__name__)
+API_TOKEN = 'pdltp_ddf4e09704b297cbe0f6b792d9b5128e94678ec14c991d98b7befc8102ca7555b1c596'
 
-@app.route('/')
-def get_me_and_display():
-    # [cite_start]環境変数からトークンを取得 [cite: 2]
-    padlet_token = os.environ.get('PADLET_TOKEN')
-    
-    if not padlet_token:
-        return "エラー: VercelのSettingsで PADLET_TOKEN を設定してください。", 500
+# エンドポイント
+url = "https://api.padlet.dev/v1/me"
 
-    # [cite_start]Padlet APIへリクエスト [cite: 2]
-    url = 'https://api.padlet.dev/v1/me'
-    headers = {'X-Padlet-Token': padlet_token}
+# ヘッダーの設定
+headers = {
+    "Authorization": f"Bearer {API_TOKEN}",
+    "Content-Type": "application/json"
+}
 
-    try:
-        [cite_start]response = requests.get(url, headers=headers) [cite: 2]
-        [cite_start]data = response.json() [cite: 2]
-        
-        # 実行結果を画面に出力するためのHTML
-        return f"""
-        <html>
-            <head><title>Padlet User Info</title></head>
-            <body>
-                <h1>Padlet実行結果</h1>
-                <pre>{data}</pre> 
-            </body>
-        </html>
-        """
-    except Exception as e:
-        return f"実行エラー: {str(e)}", 500
+try:
+    # GETリクエストの送信
+    response = requests.get(url, headers=headers)
 
-# [cite_start]Vercel用のハンドラ [cite: 2, 3]
-def handler(environ, start_response):
-    return app(environ, start_response)
+    # ステータスコードの確認
+    if response.status_code == 200:
+        user_info = response.json()
+        print("--- 取得したユーザー情報 ---")
+        # 取得したい項目（名前、ユーザー名など）を表示
+        print(f"Name: {user_info['data']['attributes']['name']}")
+        print(f"Username: {user_info['data']['attributes']['username']}")
+        print(f"Email: {user_info['data']['attributes']['email']}")
+    else:
+        print(f"エラーが発生しました。ステータスコード: {response.status_code}")
+        print(response.text)
+
+except Exception as e:
+    print(f"接続中にエラーが発生しました: {e}")
