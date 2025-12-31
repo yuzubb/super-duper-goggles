@@ -1,10 +1,7 @@
 const axios = require('axios');
 
 module.exports = async (req, res) => {
-  // CORSの設定（必要に応じて）
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  
-  // 環境変数からトークンを取得
+  // 環境変数からトークンを取得（Vercelの管理画面で設定したもの）
   const PADLET_TOKEN = process.env.PADLET_TOKEN;
 
   try {
